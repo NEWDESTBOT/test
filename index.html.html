@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Какой ты продавец на самом деле</title>
+<style>
+  :root{
+    --ink:#1134FF;
+    --ink-2:#0C2ACC;
+    --paper:#FFFFFF;
+    --paper-2:#EEF1FF;
+    --ink-text:#1134FF;
+    --paper-text:#FFFFFF;
+    --paper-text-dim:#C7D2FF;
+    --amber:#FFFFFF;
+    --amber-dim:#D7DFFF;
+    --teal:#7C93FF;
+    --red:#B51A20;
+    --line-dark:rgba(255,255,255,0.28);
+    --line-paper:rgba(21,65,245,0.22);
+    --radius:0px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--paper-text);
+    font-family:'Courier New',Courier,monospace;
+    min-height:100vh;
+    line-height:1.5;
+    letter-spacing:0.015em;
+  }
+  h1,h2,h3,.serif{
+    font-family:'Courier New',Courier,monospace;
+    font-weight:700;
+    letter-spacing:0.02em;
+  }
+  button{font-family:inherit;}
+  a{color:inherit;}
+  .screen{display:none;min-height:100vh;}
+  .screen.active{display:flex;flex-direction:column;}
+
+  /* ---------- HERO ---------- */
+  #screen-hero{
+    align-items:center;
+    justify-content:center;
+    padding:8vh 24px;
+    text-align:center;
+  }
+  .hero-inner{max-width:640px;margin:0 auto;}
+  .hero-kicker{
+    font-size:15px;
+    color:var(--teal);
+    margin-bottom:28px;
+    line-height:1.6;
+    max-width:480px;
+    margin-left:auto;margin-right:auto;
+  }
+  .hero-dial{
+    width:120px;height:120px;
+    margin:0 auto 36px;
+  }
+  h1.hero-title{
+    font-size:clamp(34px,6vw,54px);
+    line-height:1.08;
+    margin:0 0 22px;
+    color:var(--paper-text);
+  }
+  .hero-sub{
+    font-size:17px;
+    color:var(--paper-text-dim);
+    max-width:460px;
+    margin:0 auto 40px;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background:var(--amber);
+    color:var(--ink);
+    border:none;
+    padding:16px 30px;
+    font-size:16px;
+    font-weight:600;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .btn:hover{background:#EEF1FF;}
+  .btn:focus-visible{outline:3px solid var(--paper-text);outline-offset:3px;}
+  .hero-meta{
+    margin-top:28px;
+    font-size:13px;
+    color:var(--paper-text-dim);
+  }
+
+  /* ---------- QUIZ ---------- */
+  #screen-quiz{
+    align-items:center;
+    justify-content:center;
+    padding:6vh 20px;
+  }
+  .quiz-card{
+    background:var(--paper);
+    color:var(--ink-text);
+    max-width:600px;
+    width:100%;
+    padding:44px 40px 36px;
+    border-radius:var(--radius);
+    border:6px solid var(--red);
+  }
+  .quiz-progress-track{
+    height:2px;
+    background:var(--line-paper);
+    width:100%;
+    margin-bottom:10px;
+  }
+  .quiz-progress-fill{
+    height:2px;
+    background:var(--ink);
+    width:0%;
+    transition:width .3s ease;
+  }
+  .quiz-count{
+    font-size:13px;
+    color:var(--ink);
+  }
+  .quiz-nav-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:28px;
+  }
+  .back-arrow{
+    background:transparent;
+    border:2px solid var(--ink);
+    color:var(--ink);
+    width:34px;height:34px;
+    font-size:17px;
+    font-weight:700;
+    font-family:'Courier New',Courier,monospace;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    transition:all .15s ease;
+  }
+  .back-arrow:hover{background:var(--ink);color:var(--paper);}
+  .back-arrow:focus-visible{outline:3px solid var(--red);outline-offset:2px;}
+  .back-arrow:disabled{
+    opacity:0;
+    pointer-events:none;
+  }
+  .quiz-question{
+    font-size:clamp(22px,3.4vw,28px);
+    line-height:1.32;
+    margin:0 0 36px;
+    color:var(--ink-text);
+    font-weight:700;
+    letter-spacing:0.03em;
+  }
+  .scale{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .scale-btn{
+    flex:1;
+    aspect-ratio:1/1;
+    clip-path:polygon(50% 0%, 59.9% 40.1%, 100% 50%, 59.9% 59.9%, 50% 100%, 40.1% 59.9%, 0% 50%, 40.1% 40.1%);
+    border:none;
+    background:var(--paper-2);
+    color:var(--ink-text);
+    font-size:17px;
+    font-weight:700;
+    letter-spacing:0.02em;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s ease;
+  }
+  .scale-btn:hover{background:var(--line-paper);}
+  .scale-btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px;}
+  .scale-btn.selected{background:var(--red);color:var(--paper);}
+  .scale-labels{
+    display:flex;
+    justify-content:space-between;
+    font-size:12.5px;
+    color:var(--ink-text);
+    opacity:.6;
+  }
+
+  /* ---------- RESULTS ---------- */
+  #screen-result{align-items:stretch;}
+  .result-hero{
+    background:var(--ink);
+    text-align:center;
+    padding:9vh 24px 7vh;
+  }
+  .result-eyebrow{
+    font-size:14px;
+    color:var(--teal);
+    margin-bottom:18px;
+  }
+  .result-profile{
+    font-size:clamp(36px,7vw,58px);
+    margin:0 0 14px;
+    color:var(--paper-text);
+  }
+  .result-tier{
+    font-size:17px;
+    color:var(--paper-text-dim);
+    max-width:520px;
+    margin:0 auto;
+  }
+  .result-body{
+    background:var(--paper);
+    color:var(--ink-text);
+    padding:64px 24px 80px;
+  }
+  .result-inner{max-width:640px;margin:0 auto;}
+  .result-section{margin-bottom:52px;}
+  .result-section h2{
+    font-size:22px;
+    margin:0 0 18px;
+    color:var(--ink-text);
+  }
+  .result-section p{
+    font-size:16px;
+    color:var(--ink-text);
+    margin:0 0 14px;
+  }
+
+  .gauge{margin:24px 0 8px;}
+  .gauge-track{
+    position:relative;
+    height:6px;
+    background:var(--line-paper);
+    margin-bottom:10px;
+  }
+  .gauge-fill{
+    position:absolute;left:0;top:0;bottom:0;
+    background:linear-gradient(90deg,var(--teal),var(--ink));
+  }
+  .gauge-dot{
+    position:absolute;top:50%;
+    width:22px;height:22px;
+    background:var(--red);
+    clip-path:polygon(50% 0%, 59.9% 40.1%, 100% 50%, 59.9% 59.9%, 50% 100%, 40.1% 59.9%, 0% 50%, 40.1% 40.1%);
+    transform:translate(-50%,-50%);
+  }
+  .gauge-labels{
+    display:flex;justify-content:space-between;
+    font-size:12.5px;color:var(--ink-text);opacity:.65;
+  }
+
+  .tip-list{
+    list-style:none;
+    margin:20px 0 0;
+    padding:0;
+  }
+  .tip-list li{
+    position:relative;
+    padding-left:30px;
+    margin-bottom:20px;
+    font-size:16px;
+    line-height:1.55;
+    color:var(--ink-text);
+  }
+  .tip-list li::before{
+    content:'';
+    position:absolute;
+    left:0;top:5px;
+    width:14px;height:14px;
+    background:var(--red);
+    clip-path:polygon(50% 0%, 59.9% 40.1%, 100% 50%, 59.9% 59.9%, 50% 100%, 40.1% 59.9%, 0% 50%, 40.1% 40.1%);
+  }
+  .radar-wrap{
+    display:flex;
+    justify-content:center;
+    margin-bottom:36px;
+  }
+  .radar-grid{fill:none;stroke:var(--line-paper);stroke-width:1;}
+  .radar-axis{stroke:var(--line-paper);stroke-width:1;}
+  .radar-fill{fill:var(--ink);fill-opacity:0.14;stroke:var(--ink);stroke-width:2;stroke-linejoin:round;}
+  .radar-point{fill:var(--red);}
+  .radar-point.is-dominant{fill:var(--red);}
+  .radar-label{
+    fill:var(--ink-text);
+    font-family:'Courier New',Courier,monospace;
+    font-weight:700;
+    font-size:12px;
+    letter-spacing:0.02em;
+  }
+  .radar-label.is-dominant{fill:var(--red);}
+  .bars{margin-top:8px;}
+  .bar-row{margin-bottom:16px;}
+  .bar-row-top{
+    display:flex;justify-content:space-between;
+    font-size:14px;margin-bottom:6px;
+  }
+  .bar-name{font-weight:600;}
+  .bar-track{
+    height:10px;
+    background:var(--line-paper);
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    background:var(--teal);
+    transition:width .6s ease;
+  }
+  .bar-row.dominant .bar-fill{background:var(--ink);}
+  .bar-row.dominant .bar-name{color:var(--ink);}
+
+  .cta-box{
+    background:var(--ink);
+    color:var(--paper-text);
+    padding:40px 32px;
+    border-radius:var(--radius);
+    text-align:center;
+  }
+  .cta-box p{color:var(--paper-text-dim);font-size:15.5px;margin:0 0 22px;}
+  .cta-box .btn{margin-bottom:14px;}
+  .restart-link{
+    display:block;
+    font-size:14px;
+    color:var(--paper-text-dim);
+    text-decoration:underline;
+    text-underline-offset:3px;
+    margin-top:6px;
+    background:none;border:none;cursor:pointer;
+  }
+
+  .source-note{
+    font-size:12.5px;
+    color:var(--ink-text);
+    opacity:.55;
+    margin-top:8px;
+  }
+
+  @media (max-width:480px){
+    .quiz-card{padding:32px 22px 28px;}
+    .scale-btn{font-size:14px;}
+    .result-body{padding:48px 18px 64px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<div class="screen active" id="screen-hero">
+  <div class="hero-inner">
+    <svg class="hero-dial" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <polygon points="60,0 71.88,48.12 120,60 71.88,71.88 60,120 48.12,71.88 0,60 48.12,48.12" fill="#FFFFFF"/>
+    </svg>
+    <p class="hero-kicker">По методике CEB/Gartner и исследованию Уортонской школы бизнеса</p>
+    <h1 class="hero-title">Какой ты продавец на самом деле</h1>
+    <p class="hero-sub">25 вопросов, 5 минут. Узнай свой профиль по методике CEB/Gartner (6000+ продавцов) и позицию по шкале интроверт—амбиверт—экстраверт по исследованию Уортонской школы бизнеса.</p>
+    <button class="btn" onclick="startQuiz()">Начать диагностику</button>
+    <p class="hero-meta">Результат — не приговор, а стартовая точка</p>
+  </div>
+</div>
+
+<!-- ================= QUIZ ================= -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-card">
+    <div class="quiz-progress-track"><div class="quiz-progress-fill" id="progressFill"></div></div>
+    <div class="quiz-nav-row">
+      <button class="back-arrow" id="backArrow" onclick="goBack()" aria-label="Вернуться к предыдущему вопросу" type="button">←</button>
+      <div class="quiz-count" id="questionCount">Вопрос 1 из 25</div>
+    </div>
+    <p class="quiz-question" id="questionText"></p>
+    <div class="scale" id="scaleButtons"></div>
+    <div class="scale-labels"><span>Не про меня</span><span>Точно про меня</span></div>
+  </div>
+</div>
+
+<!-- ================= RESULT ================= -->
+<div class="screen" id="screen-result">
+  <div class="result-hero">
+    <div class="result-eyebrow">Твой профиль</div>
+    <h2 class="result-profile" id="resultProfileName"></h2>
+    <p class="result-tier" id="resultTierLine"></p>
+  </div>
+  <div class="result-body">
+    <div class="result-inner">
+
+      <div class="result-section">
+        <h2>Позиция на шкале общительности</h2>
+        <div class="gauge">
+          <div class="gauge-track">
+            <div class="gauge-fill" id="gaugeFill"></div>
+            <div class="gauge-dot" id="gaugeDot"></div>
+          </div>
+          <div class="gauge-labels"><span>Интроверт</span><span>Амбиверт</span><span>Экстраверт</span></div>
+        </div>
+        <p id="tierText"></p>
+        <p class="source-note">По методике Adam Grant, Wharton School — «Rethinking the Extraverted Sales Ideal», Psychological Science, 2013</p>
+      </div>
+
+      <div class="result-section">
+        <h2>О твоём профиле</h2>
+        <p id="profileText"></p>
+        <p class="source-note">По методике Dixon & Adamson (CEB/Gartner) — «The Challenger Sale», основано на данных более 6000 продавцов</p>
+      </div>
+
+      <div class="result-section">
+        <h2>Как продавать эффективно, не ломая себя</h2>
+        <p>Не «стань другим типом», а используй свои особенности так, как обычно не советуют:</p>
+        <ul class="tip-list" id="tipList"></ul>
+      </div>
+
+      <div class="result-section">
+        <h2>Твоя карта продавца</h2>
+        <div class="radar-wrap" id="radarContainer"></div>
+        <h2>Все пять профилей — твоё распределение</h2>
+        <div class="bars" id="barsContainer"></div>
+      </div>
+
+      <div class="cta-box">
+        <h2 style="margin:0 0 12px;">Это стартовая точка, не приговор</h2>
+        <p>Профиль можно осознанно докручивать. Курс «Продажи» в боте разбирает, как продавать в своём типе — и как закрывать именно те слепые зоны, что описаны выше.</p>
+        <button class="btn" onclick="alert('Здесь будет ссылка на курс «Продажи» в боте')">Смотреть курс «Продажи»</button>
+        <button class="restart-link" onclick="restartQuiz()">Пройти тест ещё раз</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- QUESTION BANK ---------- */
+// type: 'E' = extraversion scale, 'W'/'C'/'R'/'L'/'P' = five Challenger-Sale-style profiles
+const questions = [
+  {t:'E', r:false, q:'Я легко завожу разговор с незнакомым человеком'},
+  {t:'W', q:'Я готов сделать на один звонок больше, чем остальные, если это может помочь сделке'},
+  {t:'C', q:'Мне комфортно не соглашаться с клиентом, если считаю, что он ошибается'},
+  {t:'R', q:'Мне важно, чтобы клиент видел во мне человека, а не просто продавца'},
+  {t:'E', r:true, q:'После насыщенного дня общения мне нужно побыть в одиночестве, чтобы восстановиться'},
+  {t:'L', q:'Я больше доверяю своей интуиции, чем прописанным скриптам и инструкциям'},
+  {t:'P', q:'Я очень внимателен к деталям и стараюсь не упустить ничего важного'},
+  {t:'W', q:'Не сдаюсь после первого отказа — пробую снова, просто с другим подходом'},
+  {t:'C', q:'Я стараюсь понимать бизнес клиента глубже, чем от меня обычно ожидают'},
+  {t:'E', r:false, q:'Мне нравится быть в центре внимания'},
+  {t:'R', q:'Я готов потратить личное время, чтобы помочь клиенту, даже без прямой выгоды для сделки'},
+  {t:'L', q:'Мне некомфортно, когда меня жёстко контролируют в процессе работы'},
+  {t:'P', q:'Мне важно, чтобы после сделки у клиента не осталось нерешённых вопросов'},
+  {t:'W', q:'Мне важна обратная связь, и я сам её запрашиваю, чтобы становиться лучше'},
+  {t:'E', r:true, q:'В разговоре я скорее слушаю, чем говорю первым'},
+  {t:'C', q:'Мне нравится спорить и отстаивать свою точку зрения в переговорах'},
+  {t:'R', q:'Мне легко находить общий язык почти с любым человеком'},
+  {t:'L', q:'Я уверен в своих решениях, даже когда коллеги сомневаются'},
+  {t:'P', q:'Я быстро реагирую, если у клиента что-то пошло не так'},
+  {t:'W', q:'Мне не нужен внешний контроль, чтобы работать усердно — я мотивирую себя сам'},
+  {t:'E', r:true, q:'Долгое общение с людьми физически утомляет меня'},
+  {t:'C', q:'Я готов надавить на клиента, если вижу, что он тянет с решением без веской причины'},
+  {t:'R', q:'Долгие отношения с клиентом важнее для меня, чем одна быстрая продажа'},
+  {t:'L', q:'Предпочитаю действовать по-своему, даже если это расходится с общепринятым подходом'},
+  {t:'P', q:'Мне важно, чтобы всё было сделано надёжно, даже если это медленнее'}
+];
+
+const profileMeta = {
+  W:{name:'Работяга', text:'Твоя сила — дисциплина и объём. Ты не самый эффектный человек на переговорах, но именно ты сделаешь на один звонок больше, когда другие уже разошлись по домам, и не опустишь руки после первого «нет». Исследование Диксона и Адамсона показывает: этот тип стабильно даёт средний, предсказуемый результат — но реже других выбивается в топ, особенно в сложных сделках, где решение принимает не один человек, а целая группа с разными интересами. Слепая зона: объём усилий иногда подменяет собой стратегию — можно очень много работать не в том направлении.'},
+  C:{name:'Челленджер', text:'Ты не боишься не соглашаться с клиентом — и именно это, по данным исследования Диксона и Адамсона, отличает самый результативный профиль продавцов в сложных B2B-сделках. Ты приносишь клиенту не то, что он просил, а то, о чём он не подумал сам, и готов настоять на своей точке зрения, когда видишь, что клиент тянет без причины. Слепая зона: та же настойчивость, которая продаёт сложные сделки, может звучать слишком напористо в простых, быстрых продажах, где клиенту нужнее спокойствие, чем спор.'},
+  R:{name:'Строитель отношений', text:'Тебе легко нравиться людям — ты помнишь детали, искренне заботишься о клиенте и готов помогать даже без прямой выгоды. Это самый интуитивно понятный образ «хорошего продавца» — и здесь исследование Диксона и Адамсона выдаёт неожиданный результат: в сложных корпоративных продажах именно этот тип в среднем показывает самые слабые результаты среди пяти профилей, потому что стремление сохранить хорошие отношения мешает вовремя надавить или настоять на цене. В простых, повторяющихся продажах и в удержании клиентов этот же профиль — огромное преимущество.'},
+  L:{name:'Одинокий волк', text:'Ты доверяешь своей интуиции больше, чем инструкциям, и не любишь, когда тебя жёстко контролируют. Часто именно такие продавцы неожиданно показывают высокие личные результаты — но плохо вписываются в командные процессы и тяжело поддаются обучению по шаблону, потому что предпочитают идти своим путём даже там, где чужой опыт мог бы сэкономить время. Сильная сторона — независимость и уверенность в переговорах. Слепая зона — сложности с передачей своего же опыта другим и с работой по единому процессу команды.'},
+  P:{name:'Решатель проблем', text:'Ты не пропускаешь детали и держишь слово: если что-то пошло не так у клиента — ты уже разбираешься. Это ценнейший профиль для удержания клиентов и повторных продаж, где доверие строится на надёжности, а не на харизме. В активных продажах новым клиентам этот же профиль иногда проигрывает в скорости — тщательность требует времени, а быстро развивающаяся сделка иногда не может ждать, пока всё будет разложено по полочкам.'}
+};
+
+const practicalMeta = {
+  W:[
+    'Не смешивай холодный охват и переговоры в одном блоке времени — раздели дни на «дни объёма» и «дни закрытия». Твоя мотивация питается движением, а не сидением над одной сложной сделкой часами.',
+    'Заведи счётчик, который соревнуется не с коллегами, а с твоим же вчерашним результатом. Тебе не нужно внешнее одобрение для драйва — нужна видимая динамика.',
+    'Не жди, пока тебе дадут обратную связь — поставь регулярную встречу на 15 минут в чужом календаре сам. Ты один из немногих типов, кто реально хочет фидбэк, но стесняется его просить.'
+  ],
+  C:[
+    'Не пытайся звучать мягче, как тебе наверняка советовали — вместо этого отправляй спорную мысль сначала письмом, до звонка. Так клиент успевает переварить вызов без ощущения, что его прижали при свидетелях.',
+    'В простых, быстрых продажах, где твой напор — перебор, задай один открытый вопрос и держи паузу 10 секунд, прежде чем выдать инсайт. Это превращает тебя из «спорщика» в «любопытного», не притупляя саму мысль.',
+    'Веди список формулировок, на которые клиенты реагируют сильнее всего — это твой личный «сценарий вызова», который можно повторять осознанно, а не полагаться каждый раз на озарение в моменте.'
+  ],
+  R:[
+    'Не заставляй себя «дожимать» на закрытии — отдай этот момент партнёру или коллеге, а сам оставайся тем, кто держит отношения. Именно смешение этих двух ролей в одном человеке чаще всего проваливает сделку у твоего типа.',
+    'Формализуй свою щедрость: предлагай бесплатную «диагностическую сессию» как официальный шаг перед питчем, а не спонтанную любезность. Так она и укрепляет доверие, и фильтрует случайных людей.',
+    'Возьми за правило самому называть следующий шаг вслух в конце звонка, до того как спросишь мнение клиента. Твой инстинкт — не давить, поэтому разговор часто заканчивается тепло, но без конкретики.'
+  ],
+  L:[
+    'Не ломай себя под общий скрипт — выпроси себе отдельный сегмент клиентов, где официально разрешено работать по-своему, в обмен на то, что делишься результатом (не процессом) с командой.',
+    'Раз ты сопротивляешься тому, чтобы тебя учили — начни учить сам. Возьми одного новичка на «тень» твоих реальных звонков: объясняя вслух, ты сам неожиданно формулируешь то, что раньше делал чисто интуитивно.',
+    'Заранее договорись о частоте отчётности — например, один созвон в неделю вместо постоянного контроля. Ты не против ответственности как таковой, тебя раздражает именно микроменеджмент в моменте.'
+  ],
+  P:[
+    'Используй своё чутьё на проблемы не только после сделки, а во время продажи: присылай клиенту короткую заметку «вот что может стать проблемой» ещё до подписания. Конкуренты обычно делают это только постфактум.',
+    'Не изображай скорость, которая тебе несвойственна — вместо этого один раз собери подробный чек-лист/аудит, который можно вручать каждому новому клиенту. Твоя тщательность становится видимым продуктом, а не незаметным фоновым трудом.',
+    'Поставь себе явный порог «достаточно готов» (например, 80% уверенности) перед звонком — это защищает твою сильную сторону (внимание к деталям), не давая ей превратиться в бесконечную подготовку вместо действия.'
+  ]
+};
+
+const tierMeta = {
+  intro:{label:'Интроверт-тяготеющий', text:'По складу ты скорее интроверт — тебе комфортнее слушать, чем говорить первым, и долгое общение выматывает больше, чем других. Исследование Адама Гранта (Wharton) показывает: сама по себе интровертность не мешает продавать — слабые результаты чаще показывают крайности в любую сторону. Задача не «стать общительнее любой ценой», а сознательно использовать паузы и внимательное слушание как реальное преимущество, а не как недостаток, который нужно скрывать.'},
+  ambi:{label:'Амбиверт', text:'По складу ты — амбиверт: не тянешь одеяло разговора на себя, но и не теряешься в диалоге. Это статистически самая сильная позиция для продаж: исследование Адама Гранта (более 340 продавцов) показало, что именно амбиверты продают в среднем лучше и убеждённых экстравертов, и убеждённых интровертов — потому что гибко переключаются между «говорить» и «слушать» вместо того, чтобы жёстко держаться одной роли. Это преимущество редко осознаётся — многие считают свою гибкость чем-то средним и незначительным, хотя по факту это сильная сторона.'},
+  extra:{label:'Экстраверт-тяготеющий', text:'По складу ты скорее экстраверт — тебе комфортно быть в центре внимания и говорить первым. Это работает на тебя в моментах первого контакта и в презентациях. Но то же исследование Гранта показывает: избыток напора иногда снижает результат — экстраверты рискуют говорить больше, чем слушать. Сильная сторона раскрывается полностью, если сознательно оставлять больше пространства для того, чтобы говорил клиент, а не ты.'}
+};
+
+let current = 0;
+const answers = new Array(questions.length).fill(null);
+
+function starPoints(cx,cy,ro,ri){
+  const angles=[0,45,90,135,180,225,270,315];
+  return angles.map((deg,i)=>{
+    const r = i%2===0 ? ro : ri;
+    const rad = deg*Math.PI/180;
+    const x = cx + r*Math.sin(rad);
+    const y = cy - r*Math.cos(rad);
+    return x.toFixed(1)+','+y.toFixed(1);
+  }).join(' ');
+}
+
+function buildRadar(scores, dominant){
+  const order = ['W','C','R','L','P'];
+  const cx=220, cy=220, maxR=86;
+  const n = order.length;
+
+  const vertex = (i, r) => {
+    const angle = (-90 + i*(360/n)) * Math.PI/180;
+    return { x: cx + r*Math.sin(angle), y: cy - r*Math.cos(angle) };
+  };
+
+  // background grid (4 concentric rings)
+  let grid='';
+  [0.25,0.5,0.75,1].forEach(level=>{
+    const pts = order.map((_,i)=>{ const v=vertex(i, maxR*level); return v.x.toFixed(1)+','+v.y.toFixed(1); }).join(' ');
+    grid += `<polygon class="radar-grid" points="${pts}"/>`;
+  });
+
+  // axis lines
+  let axes='';
+  order.forEach((_,i)=>{
+    const v = vertex(i, maxR);
+    axes += `<line class="radar-axis" x1="${cx}" y1="${cy}" x2="${v.x.toFixed(1)}" y2="${v.y.toFixed(1)}"/>`;
+  });
+
+  // data polygon
+  const dataPts = order.map((k,i)=>{
+    const frac = scores[k]/20;
+    const v = vertex(i, maxR*frac);
+    return v;
+  });
+  const dataPolyStr = dataPts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
+
+  // data point star markers
+  let markers='';
+  dataPts.forEach((p,i)=>{
+    const k = order[i];
+    const cls = k===dominant ? 'radar-point is-dominant' : 'radar-point';
+    markers += `<polygon class="${cls}" points="${starPoints(p.x,p.y,7,2.2)}"/>`;
+  });
+
+  // labels — offset kept modest, viewBox sized generously so text never clips
+  let labels='';
+  order.forEach((k,i)=>{
+    const v = vertex(i, maxR+30);
+    const anchor = v.x > cx+4 ? 'start' : (v.x < cx-4 ? 'end' : 'middle');
+    const cls = k===dominant ? 'radar-label is-dominant' : 'radar-label';
+    const words = profileMeta[k].name.split(' ');
+    let tspans='';
+    if(words.length>1){
+      const mid = Math.ceil(words.length/2);
+      const line1 = words.slice(0,mid).join(' ');
+      const line2 = words.slice(mid).join(' ');
+      tspans = `<tspan x="${v.x.toFixed(1)}" dy="0">${line1}</tspan><tspan x="${v.x.toFixed(1)}" dy="14">${line2}</tspan>`;
+    } else {
+      tspans = `<tspan x="${v.x.toFixed(1)}" dy="0">${words[0]}</tspan>`;
+    }
+    labels += `<text class="${cls}" x="${v.x.toFixed(1)}" y="${v.y.toFixed(1)}" text-anchor="${anchor}">${tspans}</text>`;
+  });
+
+  return `<svg viewBox="0 0 440 440" width="360" height="360" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;overflow:visible;">
+    ${grid}${axes}
+    <polygon class="radar-fill" points="${dataPolyStr}"/>
+    ${markers}
+    ${labels}
+  </svg>`;
+}
+
+function goBack(){
+  if(current>0){
+    current--;
+    renderQuestion();
+  }
+}
+
+function startQuiz(){
+  document.getElementById('screen-hero').classList.remove('active');
+  document.getElementById('screen-quiz').classList.add('active');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = questions[current];
+  document.getElementById('questionCount').textContent = `Вопрос ${current+1} из ${questions.length}`;
+  document.getElementById('progressFill').style.width = ((current)/questions.length*100)+'%';
+  document.getElementById('backArrow').disabled = (current===0);
+  document.getElementById('questionText').textContent = q.q;
+
+  const wrap = document.getElementById('scaleButtons');
+  wrap.innerHTML='';
+  for(let i=1;i<=5;i++){
+    const b = document.createElement('button');
+    b.className='scale-btn';
+    b.type='button';
+    b.textContent=i;
+    b.setAttribute('aria-label', 'Оценка '+i+' из 5');
+    if(answers[current]===i) b.classList.add('selected');
+    b.onclick=()=>selectAnswer(i);
+    wrap.appendChild(b);
+  }
+}
+
+function selectAnswer(value){
+  answers[current]=value;
+  renderQuestion();
+  setTimeout(()=>{
+    if(current < questions.length-1){
+      current++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }, 220);
+}
+
+function showResult(){
+  document.getElementById('progressFill').style.width='100%';
+
+  // profile scores
+  const scores = {W:0,C:0,R:0,L:0,P:0};
+  let eSum = 0;
+  questions.forEach((q,i)=>{
+    const a = answers[i];
+    if(q.t==='E'){
+      eSum += q.r ? (6-a) : a;
+    } else {
+      scores[q.t]+=a;
+    }
+  });
+
+  // dominant profile
+  let dominant='W', max=-1;
+  Object.keys(scores).forEach(k=>{ if(scores[k]>max){max=scores[k];dominant=k;} });
+
+  // tier
+  let tierKey='ambi';
+  if(eSum<=12) tierKey='intro';
+  else if(eSum>=19) tierKey='extra';
+
+  document.getElementById('screen-quiz').classList.remove('active');
+  document.getElementById('screen-result').classList.add('active');
+
+  document.getElementById('radarContainer').innerHTML = buildRadar(scores, dominant);
+
+  document.getElementById('resultProfileName').textContent = profileMeta[dominant].name;
+  document.getElementById('resultTierLine').textContent = tierMeta[tierKey].label + ' · доминирующий профиль по методике Dixon & Adamson';
+  document.getElementById('profileText').textContent = profileMeta[dominant].text;
+  document.getElementById('tierText').textContent = tierMeta[tierKey].text;
+
+  const tipListEl = document.getElementById('tipList');
+  tipListEl.innerHTML = '';
+  practicalMeta[dominant].forEach(tip=>{
+    const li = document.createElement('li');
+    li.textContent = tip;
+    tipListEl.appendChild(li);
+  });
+
+  // gauge (5-25 range mapped to 0-100%)
+  const pct = Math.max(0,Math.min(100, (eSum-5)/20*100));
+  document.getElementById('gaugeFill').style.width = pct+'%';
+  document.getElementById('gaugeDot').style.left = pct+'%';
+
+  // bars
+  const barsWrap = document.getElementById('barsContainer');
+  barsWrap.innerHTML='';
+  const order = Object.keys(scores).sort((a,b)=>scores[b]-scores[a]);
+  order.forEach(k=>{
+    const row=document.createElement('div');
+    row.className='bar-row'+(k===dominant?' dominant':'');
+    const pctBar = (scores[k]/20*100).toFixed(0);
+    row.innerHTML = `
+      <div class="bar-row-top"><span class="bar-name">${profileMeta[k].name}</span><span>${scores[k]} / 20</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pctBar}%"></div></div>
+    `;
+    barsWrap.appendChild(row);
+  });
+
+  window.scrollTo(0,0);
+}
+
+function restartQuiz(){
+  current=0;
+  answers.fill(null);
+  document.getElementById('screen-result').classList.remove('active');
+  document.getElementById('screen-hero').classList.add('active');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
